@@ -1,0 +1,236 @@
+{
+  "name": "My workflow 2",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1qx9nIlz1W6xBz_yePTV3bZOLQtQe3WpU",
+          "mode": "list",
+          "cachedResultName": "n8n Demo",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1qx9nIlz1W6xBz_yePTV3bZOLQtQe3WpU"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        -220,
+        -20
+      ],
+      "id": "f3e23190-9e09-4446-9f8a-24c3537ac330",
+      "name": "Google Drive Trigger",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "NzzM9l8ZBZlGs7jg",
+          "name": "Google Drive account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": []
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        0,
+        -20
+      ],
+      "id": "a2796231-1d32-464c-9770-ed2770a03c0e",
+      "name": "Set File ID"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "1IfwlKF9PeilPDy3RBjadQb3QhLXcISxI",
+          "mode": "list",
+          "cachedResultName": "Project Brief.pdf",
+          "cachedResultUrl": "https://drive.google.com/file/d/1IfwlKF9PeilPDy3RBjadQb3QhLXcISxI/view?usp=drivesdk"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        240,
+        -20
+      ],
+      "id": "323a5670-3b8f-4ca4-a174-c00a07a4dae3",
+      "name": "Download File",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "NzzM9l8ZBZlGs7jg",
+          "name": "Google Drive account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": {
+          "__rl": true,
+          "mode": "id",
+          "value": "documents"
+        },
+        "options": {
+          "queryName": "match_documents"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        440,
+        -20
+      ],
+      "id": "51ec5783-0f21-4039-af35-5df1df6f2342",
+      "name": "Upload Google Drive Files to Vetor Store",
+      "credentials": {
+        "supabaseApi": {
+          "id": "H4u9fiZqTHVfhoGO",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        400,
+        160
+      ],
+      "id": "cb5b1ccb-4414-41ea-8f2f-208011595239",
+      "name": "Embeddings OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "9rkGKUAIezDVbB6g",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "textSplittingMode": "custom",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        560,
+        160
+      ],
+      "id": "844c28d6-0ead-4341-97ef-93616b013cfc",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        640,
+        280
+      ],
+      "id": "3e1a33dc-c630-4c52-bc8a-02b5883e1248",
+      "name": "Recursive Character Text Splitter"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Drive Trigger": {
+      "main": [
+        [
+          {
+            "node": "Set File ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set File ID": {
+      "main": [
+        [
+          {
+            "node": "Download File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download File": {
+      "main": [
+        [
+          {
+            "node": "Upload Google Drive Files to Vetor Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Upload Google Drive Files to Vetor Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Upload Google Drive Files to Vetor Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "93c6ccc1-0f47-4585-8388-82e0af64f46a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b6e41806ed192af8986b386b4f6956396a2c640f897bb446ceceb9eb8b558832"
+  },
+  "id": "sMOExLLM4FAW7zY8",
+  "tags": []
+}

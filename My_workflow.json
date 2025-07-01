@@ -1,0 +1,611 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "9a368d75-4873-4bef-984e-612d69405cb0",
+      "name": "When chat message received",
+      "webhookId": "4c839a9f-a950-4ae0-8977-899e6c290b35"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        360
+      ],
+      "id": "a108d39a-4d65-4883-875c-c17c449342c6",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "9rkGKUAIezDVbB6g",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "=You are a helpful assistant. You are able to access Google Calendar.\n\nThe current time is {{ $now }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        220,
+        0
+      ],
+      "id": "7d3a9ecd-c6cf-49d8-9084-9b95d0a4650d",
+      "name": "Personal AI Agent"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Create an event in Google Calendar",
+        "calendar": {
+          "__rl": true,
+          "value": "marciafcastro02@gmail.com",
+          "mode": "list",
+          "cachedResultName": "marciafcastro02@gmail.com"
+        },
+        "start": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Start', `The start date and time for creating an event.`, 'string') }}",
+        "end": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('End', `The end date and time for creating an event.`, 'string') }}",
+        "additionalFields": {
+          "summary": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Summary', `The title of the event.`, 'string') }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        640,
+        300
+      ],
+      "id": "88d0c188-f163-430d-b142-cb5e63881221",
+      "name": "Create Event",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "86ZKjdBLrbh5aPYt",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Notes\nWe need an Event ID before doing certain actions on Google calendar:\n- Delete Event ",
+        "height": 220,
+        "width": 500,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        600,
+        -60
+      ],
+      "id": "37f9fa3b-6dc2-4fc1-b995-360d814822df",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Get many events in Google Calendar",
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "marciafcastro02@gmail.com",
+          "mode": "list",
+          "cachedResultName": "marciafcastro02@gmail.com"
+        },
+        "limit": 10,
+        "timeMin": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('After', `00:00:00 on the day specified by the user (inclusive)`, 'string') }}",
+        "timeMax": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Before', `23:59:59 on the day specified by the user (inclusive)`, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        920,
+        460
+      ],
+      "id": "23c39c36-7b62-48f9-b039-997a3aa45980",
+      "name": "GetManyEvents",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "86ZKjdBLrbh5aPYt",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Trigger",
+        "height": 220,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -80,
+        -60
+      ],
+      "typeVersion": 1,
+      "id": "5344eaf8-67f8-456d-ae55-613672686d3e",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## AI Agent (Calendar Agent)",
+        "height": 220,
+        "width": 400,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        180,
+        -60
+      ],
+      "typeVersion": 1,
+      "id": "ab446c2f-f09a-4c03-b219-ffbc90525491",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## Chat Model (LLM)",
+        "height": 420,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -80,
+        200
+      ],
+      "typeVersion": 1,
+      "id": "8ff03a8c-21e4-4ab3-ba4f-06ed7d2a1b37",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "## Memory",
+        "height": 420,
+        "width": 400,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        180,
+        200
+      ],
+      "typeVersion": 1,
+      "id": "4c229f11-1f24-4284-86a2-e10a3d74a9d3",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        420,
+        360
+      ],
+      "id": "b9ce79ed-19ec-4ca2-ac7f-b56a32436d89",
+      "name": "Postgres Chat Memory",
+      "credentials": {
+        "postgres": {
+          "id": "0vnbtDs2vEOswMob",
+          "name": "Supabase Conversation Memory"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        240,
+        360
+      ],
+      "id": "eef2b757-6ff7-45a5-8bc7-c50d17e57447",
+      "name": "Conversation Memory"
+    },
+    {
+      "parameters": {
+        "content": "## Tools\n",
+        "height": 420,
+        "width": 1100,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        600,
+        200
+      ],
+      "typeVersion": 1,
+      "id": "4cdc6d0f-e3d1-4a77-ba50-dbb4a85b6199",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Delete an event in Google Calendar",
+        "operation": "delete",
+        "calendar": {
+          "__rl": true,
+          "value": "marciafcastro02@gmail.com",
+          "mode": "list",
+          "cachedResultName": "marciafcastro02@gmail.com"
+        },
+        "eventId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Event_ID', `The ID for the Event to Delete`, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        920,
+        300
+      ],
+      "id": "ec594d99-29ef-48bf-9f51-6003c64002b6",
+      "name": "Delete Event",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "86ZKjdBLrbh5aPYt",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Update an event in Google Calendar",
+        "operation": "update",
+        "calendar": {
+          "__rl": true,
+          "value": "marciafcastro02@gmail.com",
+          "mode": "list",
+          "cachedResultName": "marciafcastro02@gmail.com"
+        },
+        "eventId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Event_ID', `The ID for the Event to Update`, 'string') }}",
+        "updateFields": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        640,
+        460
+      ],
+      "id": "8543dd39-0a66-46c9-a49c-cab80456a280",
+      "name": "Update Event",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "86ZKjdBLrbh5aPYt",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Work with your data in Supabase Vector Store",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        1060,
+        300
+      ],
+      "id": "b2eeabf0-bb18-40b6-b11e-1752b585b655",
+      "name": "Supabase Vector Store",
+      "credentials": {
+        "supabaseApi": {
+          "id": "H4u9fiZqTHVfhoGO",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1160,
+        460
+      ],
+      "id": "0601274e-9ecb-4ae2-aedd-3283455b4dd5",
+      "name": "Embeddings OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "9rkGKUAIezDVbB6g",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Create an event in Google Calendar",
+        "calendar": {
+          "__rl": true,
+          "value": "marciafcastro02@gmail.com",
+          "mode": "list",
+          "cachedResultName": "marciafcastro02@gmail.com"
+        },
+        "additionalFields": {
+          "attendees": [
+            "andrea8cosme@gmail.com ",
+            "catarina.m.corte.real@gmail.com "
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        780,
+        300
+      ],
+      "id": "6dc2941d-dcd2-44d2-ac03-dd4f4b9650dd",
+      "name": "Create Events with Attendees",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "86ZKjdBLrbh5aPYt",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Get availability in a calendar in Google Calendar",
+        "resource": "calendar",
+        "calendar": {
+          "__rl": true,
+          "value": "marciafcastro02@gmail.com",
+          "mode": "list",
+          "cachedResultName": "marciafcastro02@gmail.com"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        780,
+        460
+      ],
+      "id": "c483794c-d8cc-4eb4-9079-6bc4bb2a7b56",
+      "name": "Check Availability",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "86ZKjdBLrbh5aPYt",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Create a draft in Gmail",
+        "resource": "draft",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', `Invitation to be part of the Event.`, 'string') }}",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        1380,
+        300
+      ],
+      "id": "32e180ba-6a23-4c97-8f50-fd70657640c9",
+      "name": "Create and Approve Email",
+      "webhookId": "48eecac4-c1f2-4063-82e7-7383b3cd0472",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "G4hQZ7YazmilgvbM",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Get many messages in Gmail",
+        "operation": "getAll",
+        "filters": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        1560,
+        300
+      ],
+      "id": "68e39759-8ce0-4edd-a908-a113afd528c4",
+      "name": "Receive Multiple Emails",
+      "webhookId": "33499a66-c042-456c-9f94-e7bb9a59f655",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "G4hQZ7YazmilgvbM",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Personal AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Personal AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Event": {
+      "ai_tool": [
+        [
+          {
+            "node": "Personal AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GetManyEvents": {
+      "ai_tool": [
+        [
+          {
+            "node": "Personal AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Personal AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete Event": {
+      "ai_tool": [
+        [
+          {
+            "node": "Personal AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Event": {
+      "ai_tool": [
+        [
+          {
+            "node": "Personal AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Vector Store": {
+      "ai_tool": [
+        [
+          {
+            "node": "Personal AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Events with Attendees": {
+      "ai_tool": [
+        [
+          {
+            "node": "Personal AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Availability": {
+      "ai_tool": [
+        [
+          {
+            "node": "Personal AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create and Approve Email": {
+      "ai_tool": [
+        [
+          {
+            "node": "Personal AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Receive Multiple Emails": {
+      "ai_tool": [
+        [
+          {
+            "node": "Personal AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "136f8bb6-2a0e-4ee0-ac15-91eb581dbe8e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b6e41806ed192af8986b386b4f6956396a2c640f897bb446ceceb9eb8b558832"
+  },
+  "id": "ETOglONY6tidurNN",
+  "tags": []
+}
