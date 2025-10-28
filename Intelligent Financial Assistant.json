@@ -1,0 +1,1036 @@
+{
+  "name": "Intelligent Financial Assistant",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -432,
+        0
+      ],
+      "id": "922aba62-c414-4e3c-ac58-4289e30c90d7",
+      "name": "Telegram Trigger",
+      "webhookId": "fac2c806-ecd1-4d76-82f1-e8d0e063eb93",
+      "credentials": {
+        "telegramApi": {
+          "id": "iqUTzd1HF1o77TqR",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "5ead211f-934a-4d66-8e44-619ad9c338cd",
+                    "leftValue": "={{$json[\"message\"][\"photo\"]}}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "object",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Receipt OCR"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "3aa3ddf4-2e24-4eab-b199-8f3894c13ac2",
+                    "leftValue": "={{$json[\"message\"][\"text\"].toLowerCase()}}",
+                    "rightValue": "(comprei|paguei|gastei)",
+                    "operator": {
+                      "type": "string",
+                      "operation": "regex"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Expense Logging"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "d59dfdc3-036e-4038-85e7-a641a9c65054",
+                    "leftValue": "={{$json[\"message\"][\"text\"].toLowerCase()}}",
+                    "rightValue": "(onde posso comprar|preciso de|onde encontro)",
+                    "operator": {
+                      "type": "string",
+                      "operation": "regex"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Shopping Suggestion"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "42fc094a-b160-494d-af36-f3b151ed0d9a",
+                    "leftValue": "",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Other / Fallback"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        -240,
+        -32
+      ],
+      "id": "8b6e3e3c-1905-48a1-be92-234432b68b55",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "chatId": "={{$json[\"message\"][\"chat\"][\"id\"]}}",
+        "text": "=✅ Compra registrada com sucesso!  📅 Data: {{$json[\"date\"]}} 🏬 Loja: {{$json[\"loja\"]}} 📦 Produto/Categoria: {{$json[\"categoria\"]}} 💰 Valor: {{$json[\"valor\"]}} {{$json[\"moeda\"]}}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        544,
+        -16
+      ],
+      "id": "a9cb3752-6e62-416c-b8ca-f498011467bd",
+      "name": "Confirm Expense",
+      "webhookId": "33b0c90f-e84f-46c2-a4fa-a277f3c000a4",
+      "credentials": {
+        "telegramApi": {
+          "id": "iqUTzd1HF1o77TqR",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{$json[\"message\"][\"chat\"][\"id\"]}}",
+        "text": "Desculpe, não entendi. Por favor diga se você quer registrar uma compra ou pedir sugestão de onde comprar algo.",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        304
+      ],
+      "id": "a0e21955-25d3-44a8-9289-7aba66ae0879",
+      "name": "Fallback Message",
+      "webhookId": "4094d09e-e276-4ad7-963d-e871b4fd396b",
+      "credentials": {
+        "telegramApi": {
+          "id": "iqUTzd1HF1o77TqR",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{$json[\"message\"][\"photo\"][-1][\"file_id\"]}}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        -192
+      ],
+      "id": "2aab2c88-6678-40b6-b19e-aa04f8f2d9a2",
+      "name": "Get the Image Receipt",
+      "webhookId": "1d2cd7e0-9b03-45c5-8e6e-c547b9cc7e91",
+      "credentials": {
+        "telegramApi": {
+          "id": "iqUTzd1HF1o77TqR",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.ocr.space/parse/image",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "K88560877188957"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "data"
+            },
+            {
+              "name": "language",
+              "value": "por"
+            },
+            {
+              "name": "isOverlayRequired",
+              "value": "false"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        208,
+        -192
+      ],
+      "id": "a611129b-4d0e-4900-ad3d-638ab545c831",
+      "name": "OCR Receipt"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1Y04R5Un7iJ__w6OUMKN5JcsdF1voFSlU_3zYa4dh0uE",
+          "mode": "list",
+          "cachedResultName": "Expenses",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Y04R5Un7iJ__w6OUMKN5JcsdF1voFSlU_3zYa4dh0uE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Expense Logging",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Y04R5Un7iJ__w6OUMKN5JcsdF1voFSlU_3zYa4dh0uE/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Client ID": "={{$json[\"message\"][\"from\"][\"id\"]}}",
+            "Data": "={{$json[\"data\"]}}",
+            "Loja": "={{$json[\"loja\"]}}",
+            "Categoria/Produto": "={{$json[\"categoria\"]}}",
+            "Valor": "={{$json[\"valor\"]}}",
+            "Username": "={{$json[\"message\"][\"from\"][\"username\"]}}",
+            "Moeda": "={{$json[\"moeda\"]}}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Client ID",
+              "displayName": "Client ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Username",
+              "displayName": "Username",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Data",
+              "displayName": "Data",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Loja",
+              "displayName": "Loja",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Categoria/Produto",
+              "displayName": "Categoria/Produto",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Valor",
+              "displayName": "Valor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Moeda",
+              "displayName": "Moeda",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        768,
+        -192
+      ],
+      "id": "66df25f7-6dbc-4a07-abfb-0da6b1c499be",
+      "name": "Expense Logging2",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "hHK4fgIaQ6zqesCw",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{$json[\"message\"][\"chat\"][\"id\"]}}",
+        "text": "=Recebi o seu recibo 🧾   Compra registrada com sucesso!   📅 Data: {{$json[\"date\"]}} 🏬 Loja: {{$json[\"loja\"]}} 📦 Produto/Categoria: {{$json[\"categoria\"]}} 💰 Valor: {{$json[\"valor\"]}} {{$json[\"moeda\"]}}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        976,
+        -192
+      ],
+      "id": "b379aca0-ec93-4679-b033-db603c2c2d2e",
+      "name": "Receipt Confirmation",
+      "webhookId": "08775493-a261-4374-a622-1074d5bb51ad",
+      "credentials": {
+        "telegramApi": {
+          "id": "iqUTzd1HF1o77TqR",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-5",
+          "mode": "list",
+          "cachedResultName": "GPT-5"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=O usuário escreveu: \"{{$json[\"message\"][\"text\"]}}\"\n\nSua função é extrair dados de compras:\n1. Nome do produto (se possível)\n2. Loja\n3. Valor\n4. Data da compra (se mencionada; se não houver, use a data atual)\n5. Categoria do gasto (alimentação, lazer ou variável)\n6. Moeda (€)\n\nSe o usuário enviou uma foto de um recibo, indique \"tipo\": \"imagem\" e diga que deve ser processado por OCR.\n\nResponda **em JSON** em português, assim:\n{\n  \"produto\": \"...\",\n  \"loja\": \"...\",\n  \"valor\": ...,\n  \"data\": \"...\",\n  \"categoria\": \"...\",\n  \"moeda\": \"€\"\n}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        0,
+        -16
+      ],
+      "id": "5b1f8eac-810e-4dd7-88d0-0c7914c53fc7",
+      "name": "OpenAI - Expense Logging",
+      "credentials": {
+        "openAiApi": {
+          "id": "ARCV0x3CNYDB69Ly",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-5",
+          "mode": "list",
+          "cachedResultName": "GPT-5"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=O usuário perguntou: {{$json[\"message\"][\"text\"]}}  \nVocê é um assistente de compras que ajuda o cliente a encontrar produtos de boa qualidade e preço acessível.  \n\nPriorize sempre lojas parceiras abaixo e use os links indicados:  \n- Amazon Portugal: https://www.amazon.pt/?tag=SEU_CODIGO  \n- Worten: https://www.worten.pt  \n- Fnac: https://www.fnac.pt  \n- AliExpress: https://pt.aliexpress.com\n- Prozis (suplementos, fitness, roupa desportiva): https://www.prozis.com/pt/pt  \n- Wook (livros): https://www.wook.pt  \n- Bertrand (livros): https://www.bertrand.pt  \n- Notino (perfumes e cosméticos): https://www.notino.pt  \n- Booking (viagens e hotéis): https://www.booking.com/index.pt.html \n- eDreams (viagens): https://www.edreams.pt\n\nRegras:\n1. Sempre mostrar preços em euros (€).  \n2. Sempre mencionar se há opção de parcelamento (“pode ser parcelado em 3x sem juros”, etc.).  \n3. Sempre mostrar primeiro opções dessas lojas parceiras.  \n4. Se não encontrar o produto nessas lojas, mencione outras alternativas conhecidas e confiáveis, mas sem mencionar afiliação.  \n5. Responda em português, num tom simpático e informativo, como um consultor de compras online.\n\nExemplo:\n> Encontrei estas opções de fones Bluetooth:  \n> 🔹 Amazon Portugal — 29,99€ — pode ser parcelado em 3x sem juros. \n> 🔹 Worten — 31,90€ — entrega rápida e boa avaliação.  \n> 🔹 MediaMarkt — 33,00€ — alternativa interessante."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        0,
+        160
+      ],
+      "id": "e9f3f601-84b7-483c-95a5-83d3d6e089aa",
+      "name": "OpenAI - Shopping Suggestion",
+      "credentials": {
+        "openAiApi": {
+          "id": "ARCV0x3CNYDB69Ly",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1Y04R5Un7iJ__w6OUMKN5JcsdF1voFSlU_3zYa4dh0uE",
+          "mode": "list",
+          "cachedResultName": "Expenses",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Y04R5Un7iJ__w6OUMKN5JcsdF1voFSlU_3zYa4dh0uE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Expense Logging",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Y04R5Un7iJ__w6OUMKN5JcsdF1voFSlU_3zYa4dh0uE/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Data": "={{$json[\"date\"]}}",
+            "Loja": "={{$json[\"loja\"]}}",
+            "Categoria/Produto": "={{$json[\"categoria\"]}}",
+            "Valor": "={{$json[\"valor\"]}}",
+            "Moeda": "={{$json[\"moeda\"]}}",
+            "Client ID": "={{$json[\"message\"][\"from\"][\"id\"]}}",
+            "Username": "={{$json[\"message\"][\"from\"][\"username\"]}}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Client ID",
+              "displayName": "Client ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Username",
+              "displayName": "Username",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Data",
+              "displayName": "Data",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Loja",
+              "displayName": "Loja",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Categoria/Produto",
+              "displayName": "Categoria/Produto",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Valor",
+              "displayName": "Valor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Moeda",
+              "displayName": "Moeda",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        336,
+        -16
+      ],
+      "id": "cba2ad61-bf61-4487-a01e-295db0f2a9d7",
+      "name": "Expense Logging",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "hHK4fgIaQ6zqesCw",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Finance Tips Generator",
+        "height": 288,
+        "width": 976,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        544,
+        160
+      ],
+      "typeVersion": 1,
+      "id": "4d630bc2-43b3-4d83-b9d0-a25ea32d526f",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "months",
+              "triggerAtHour": 6
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        576,
+        256
+      ],
+      "id": "3bd4b39e-5ef0-4fa7-b05e-f5dff791002d",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1Y04R5Un7iJ__w6OUMKN5JcsdF1voFSlU_3zYa4dh0uE",
+          "mode": "list",
+          "cachedResultName": "Expenses",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Y04R5Un7iJ__w6OUMKN5JcsdF1voFSlU_3zYa4dh0uE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1078271956,
+          "mode": "list",
+          "cachedResultName": "Finance Analysis",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Y04R5Un7iJ__w6OUMKN5JcsdF1voFSlU_3zYa4dh0uE/edit#gid=1078271956"
+        },
+        "options": {
+          "dataLocationOnSheet": {
+            "values": {
+              "rangeDefinition": "detectAutomatically"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        768,
+        256
+      ],
+      "id": "593ea997-9193-4f5e-a1cd-44cd704714bd",
+      "name": "Read Finance Analysis",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "hHK4fgIaQ6zqesCw",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-5",
+          "mode": "list",
+          "cachedResultName": "GPT-5"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=És um consultor financeiro português.  \nAnalisa os dados financeiros abaixo e escreve uma dica curta e prática para o cliente,  \nem português de Portugal, sem emojis.  \n\nCliente: {{$json[\"Username\"]}}  \nRendimento Mensal (€): {{$json[\"Rendimento Mensal (€)\"]}}  \nGasto Fixo (€): {{$json[\"Gasto Fixo (€)\"]}}  \nGasto Variável (€): {{$json[\"Gasto Variável (€)\"]}}  \nGasto Lazer (€): {{$json[\"Gasto Lazer (€)\"]}}  \nTotal Gasto (€): {{$json[\"Total Gasto (€)\"]}}  \nPoupança (%): {{$json[\"Poupança (%)\"]}}  \n\nDá uma dica financeira útil e personalizada, explicando o que ele pode melhorar\nou como equilibrar melhor os gastos."
+            }
+          ]
+        },
+        "simplify": false,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        976,
+        256
+      ],
+      "id": "690c32ff-1b3f-4ac3-aa03-518d67933040",
+      "name": "OpenAI - Generate Financial Tip",
+      "credentials": {
+        "openAiApi": {
+          "id": "ARCV0x3CNYDB69Ly",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1Y04R5Un7iJ__w6OUMKN5JcsdF1voFSlU_3zYa4dh0uE",
+          "mode": "list",
+          "cachedResultName": "Expenses",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Y04R5Un7iJ__w6OUMKN5JcsdF1voFSlU_3zYa4dh0uE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1078271956,
+          "mode": "list",
+          "cachedResultName": "Finance Analysis",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Y04R5Un7iJ__w6OUMKN5JcsdF1voFSlU_3zYa4dh0uE/edit#gid=1078271956"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Dica Financeira": "={{$json[\"text\"]}}"
+          },
+          "matchingColumns": [
+            "Client ID"
+          ],
+          "schema": [
+            {
+              "id": "Client ID",
+              "displayName": "Client ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Username",
+              "displayName": "Username",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Rendimento Mensal (€)",
+              "displayName": "Rendimento Mensal (€)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Gasto Fixo (€)",
+              "displayName": "Gasto Fixo (€)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Gasto Variável (€)",
+              "displayName": "Gasto Variável (€)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Gasto Lazer (€)",
+              "displayName": "Gasto Lazer (€)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Gasto Total (€)",
+              "displayName": "Gasto Total (€)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Poupança (%)",
+              "displayName": "Poupança (%)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Dica Financeira",
+              "displayName": "Dica Financeira",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1328,
+        256
+      ],
+      "id": "36a1cd32-654b-4c8f-baff-abbeabc7da9a",
+      "name": "Update Tips",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "hHK4fgIaQ6zqesCw",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{$json[\"message\"][\"chat\"][\"id\"]}}",
+        "text": "={{$json[\"choices\"][0][\"message\"][\"content\"]}}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        336,
+        160
+      ],
+      "id": "da39682f-1fce-442e-bd41-2a4211406495",
+      "name": "Shopping Suggestion",
+      "webhookId": "5ae8de2d-bfa1-4b36-bbdc-29ba678637f1",
+      "credentials": {
+        "telegramApi": {
+          "id": "iqUTzd1HF1o77TqR",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-5",
+          "mode": "list",
+          "cachedResultName": "GPT-5"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=O texto extraído do recibo é:\n{{$json[\"ParsedResults\"][0][\"ParsedText\"]}}\n\nAnalise o texto e extraia as seguintes informações:\n1. Nome do produto\n2. Loja\n3. Valor total\n4. Data da compra\n5. Categoria do gasto (fixo, variável, lazer ou alimentação)\n6. Moeda (sempre €)\n\nResponda **em formato JSON** assim:\n{\n  \"produto\": \"...\",\n  \"loja\": \"...\",\n  \"valor\": \"...\",\n  \"data\": \"...\",\n  \"categoria\": \"...\",\n  \"moeda\": \"€\"\n}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        416,
+        -192
+      ],
+      "id": "b724e7ea-a4ec-421c-aa14-921df1a0e367",
+      "name": "OpenAI - Parse Receipt",
+      "credentials": {
+        "openAiApi": {
+          "id": "ARCV0x3CNYDB69Ly",
+          "name": "OpenAi account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Get the Image Receipt",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OpenAI - Expense Logging",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OpenAI - Shopping Suggestion",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Fallback Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get the Image Receipt": {
+      "main": [
+        [
+          {
+            "node": "OCR Receipt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OCR Receipt": {
+      "main": [
+        [
+          {
+            "node": "OpenAI - Parse Receipt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Expense Logging2": {
+      "main": [
+        [
+          {
+            "node": "Receipt Confirmation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI - Expense Logging": {
+      "main": [
+        [
+          {
+            "node": "Expense Logging",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Expense Logging": {
+      "main": [
+        [
+          {
+            "node": "Confirm Expense",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Read Finance Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Finance Analysis": {
+      "main": [
+        [
+          {
+            "node": "OpenAI - Generate Financial Tip",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI - Generate Financial Tip": {
+      "main": [
+        [
+          {
+            "node": "Update Tips",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI - Shopping Suggestion": {
+      "main": [
+        [
+          {
+            "node": "Shopping Suggestion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI - Parse Receipt": {
+      "main": [
+        [
+          {
+            "node": "Expense Logging2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "f07d33c4-73f3-4c2c-90b9-c091cb7452f8",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "716fe44098acb115439bad3e01ee457e7d65e14891d78109d17ccaabe8d405b8"
+  },
+  "id": "uPxDP4F0AR6pdGvE",
+  "tags": []
+}
